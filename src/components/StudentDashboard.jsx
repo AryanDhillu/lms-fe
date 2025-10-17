@@ -13,6 +13,16 @@ export default function StudentDashboard({ token }) {
   const [activeModuleIndex, setActiveModuleIndex] = useState(0)
   const [activeAssignment, setActiveAssignment] = useState(null)
 
+  // Sum of grades for submitted assignments in the selected course
+  const totalSubmittedScore = useMemo(() => {
+    try {
+      return (assignments || []).reduce((sum, a) => {
+        const val = (a && a.isSubmitted && typeof a.score === 'number') ? a.score : 0
+        return sum + val
+      }, 0)
+    } catch { return 0 }
+  }, [assignments])
+
   useEffect(() => {
     let cancelled = false
     ;(async () => {
@@ -151,6 +161,19 @@ export default function StudentDashboard({ token }) {
 
                   {isSelected && (
                     <div style={{ marginTop: 14 }}>
+                      {selectedCourse?.materialUrl && (
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+                          <a
+                            className="btn btn--secondary"
+                            href={selectedCourse.materialUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e)=> e.stopPropagation()}
+                          >
+                            Download Material
+                          </a>
+                        </div>
+                      )}
                       <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 16 }}>
                         {/* Modules sidebar */}
                         <div style={{ border: '1px solid rgba(255,255,255,.12)', borderRadius: 12, padding: 12, background: '#0b1232' }}>
@@ -195,7 +218,10 @@ export default function StudentDashboard({ token }) {
 
                       {/* Assignments list */}
                       <div style={{ marginTop: 16, border: '1px solid rgba(255,255,255,.12)', borderRadius: 12, padding: 12, background: '#0b1232' }}>
-                        <h4 style={{ marginTop: 0 }}>Assignments</h4>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                          <h4 style={{ marginTop: 0, marginBottom: 0 }}>Assignments</h4>
+                          <div style={{ color: '#cfd7ff', fontWeight: 800 }}>Total Score: {totalSubmittedScore}</div>
+                        </div>
                         {assignLoading && <div style={{ color: '#9aa6d1' }}>Loading assignments…</div>}
                         {!assignLoading && assignError && <div className="alert alert--error">{assignError}</div>}
                         {!assignLoading && !assignError && (

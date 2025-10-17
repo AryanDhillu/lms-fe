@@ -124,3 +124,15 @@ export async function getAssignmentSubmissions(assignmentId, token) {
   })
   return handleResponse(res)
 }
+
+export async function updateCourse(courseId, payload, token) {
+  const res = await fetch(`${API_BASE_URL}/api/courses/${courseId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  })
+  return handleResponse(res)
+}

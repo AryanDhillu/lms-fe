@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { getCourses, getCourseStudents, getAssignmentsTeacherView, getAssignmentSubmissions } from '../api'
 import AddAssignmentModal from './AddAssignmentModal'
 import AddModuleModal from './AddModuleModal'
+import UploadMaterialModal from './UploadMaterialModal'
 
 export default function TeacherDashboard({ onAddCourse, user, refreshSignal, token }) {
   // Courses
@@ -34,6 +35,7 @@ export default function TeacherDashboard({ onAddCourse, user, refreshSignal, tok
   // Modules (local only)
   const [modules, setModules] = useState([])
   const [showAddModule, setShowAddModule] = useState(false)
+  const [showUploadMaterial, setShowUploadMaterial] = useState(false)
 
   const teacherId = user?._id || user?.id
 
@@ -216,6 +218,7 @@ export default function TeacherDashboard({ onAddCourse, user, refreshSignal, tok
                     <span className="td-chip">{selectedCourse.duration || '—'}</span>
                     <span className="td-chip">⭐ {selectedCourse.rating || 0}</span>
                     <span className="td-chip">{selectedCourse.price === 0 ? 'Free' : `$${selectedCourse.price}`}</span>
+                    <button className="btn btn--secondary" onClick={() => setShowUploadMaterial(true)}>Upload Material</button>
                   </div>
                 </div>
               </div>
@@ -380,6 +383,18 @@ export default function TeacherDashboard({ onAddCourse, user, refreshSignal, tok
         open={showAddModule}
         onClose={() => setShowAddModule(false)}
         onCreated={(module) => { setShowAddModule(false); setModules((prev)=> [{ id: `${selectedCourse?._id}-${Date.now()}`, ...module }, ...prev]) }}
+      />
+      <UploadMaterialModal
+        open={showUploadMaterial}
+        onClose={() => setShowUploadMaterial(false)}
+        course={selectedCourse}
+        token={token}
+        onUpdated={(updated) => {
+          setShowUploadMaterial(false)
+          // Update selectedCourse and myCourses with the returned updated object
+          setSelectedCourse(updated)
+          setMyCourses((prev)=> prev.map(c => c._id === updated._id ? { ...c, ...updated } : c))
+        }}
       />
     </section>
   )
