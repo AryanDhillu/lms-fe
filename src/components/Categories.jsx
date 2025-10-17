@@ -1,5 +1,5 @@
 const Category = ({ icon, title, count, active, onClick }) => (
-  <button className="category" onClick={onClick} aria-pressed={!!active} style={{ borderColor: active ? 'rgba(255,255,255,.22)' : undefined, cursor: 'pointer' }}>
+  <button className="category" onClick={onClick} aria-pressed={!!active} style={{ cursor: 'pointer' }}>
     <div className="category__icon">{icon}</div>
     <div className="category__title">{title}</div>
     <div className="category__count">{count} courses</div>

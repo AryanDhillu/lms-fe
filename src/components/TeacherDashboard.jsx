@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getCourses, getCourseStudents, getAssignmentsTeacherView, getAssignmentSubmissions } from '../api'
 import AddAssignmentModal from './AddAssignmentModal'
+import AddModuleModal from './AddModuleModal'
 
 export default function TeacherDashboard({ onAddCourse, user, refreshSignal, token }) {
   // Courses
@@ -29,6 +30,10 @@ export default function TeacherDashboard({ onAddCourse, user, refreshSignal, tok
   const [subsLoading, setSubsLoading] = useState(false)
   const [subsError, setSubsError] = useState(null)
   const [submissions, setSubmissions] = useState([])
+
+  // Modules (local only)
+  const [modules, setModules] = useState([])
+  const [showAddModule, setShowAddModule] = useState(false)
 
   const teacherId = user?._id || user?.id
 
@@ -60,6 +65,18 @@ export default function TeacherDashboard({ onAddCourse, user, refreshSignal, tok
     setActiveTab('overview')
     setSelectedAssignment(null)
     setSubmissions([])
+    // Seed some hardcoded modules for the selected course
+    if (selectedCourse?._id) {
+      const title = selectedCourse.title || 'Course'
+      const seed = [
+        { id: `${selectedCourse._id}-m1`, title: `Introduction to ${title}`, summary: `Get started with the basics of ${title}.`, duration: '20m' },
+        { id: `${selectedCourse._id}-m2`, title: `${title} Core Concepts`, summary: `Understand the core principles and patterns in ${title}.`, duration: '35m' },
+        { id: `${selectedCourse._id}-m3`, title: `Hands-on ${title} Project`, summary: `Apply your knowledge with a practical mini project.`, duration: '45m' }
+      ]
+      setModules(seed)
+    } else {
+      setModules([])
+    }
   }, [selectedCourse?._id])
 
   // Fetch students on select
@@ -204,7 +221,7 @@ export default function TeacherDashboard({ onAddCourse, user, refreshSignal, tok
               </div>
 
               <div className="td-tabs">
-                {['overview','students','assignments'].map((t) => (
+                {['overview','modules','students','assignments'].map((t) => (
                   <button key={t} className={`td-tab ${activeTab === t ? 'td-tab--active' : ''}`} onClick={() => setActiveTab(t)}>
                     {t.charAt(0).toUpperCase() + t.slice(1)}
                   </button>
@@ -251,6 +268,34 @@ export default function TeacherDashboard({ onAddCourse, user, refreshSignal, tok
                           ))}
                         </div>
                       )
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'modules' && (
+                <div className="td-panel">
+                  <div className="td-panel__title-row">
+                    <div className="td-panel__title">Modules</div>
+                    <div className="td__actions">
+                      <button className="btn btn--secondary" onClick={() => setShowAddModule(true)}>Add Module</button>
+                    </div>
+                  </div>
+                  <div className="td-panel__body">
+                    {modules.length === 0 ? (
+                      <div className="td__empty">No modules yet.</div>
+                    ) : (
+                      <div className="td-list">
+                        {modules.map((m) => (
+                          <div key={m.id} className="td-list-item">
+                            <div className="td-list-item__left">
+                              <div className="td-list-item__title">{m.title}</div>
+                              <div className="td-list-item__meta">{m.summary}</div>
+                            </div>
+                            <div className="td-list-item__right">{m.duration || '—'}</div>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -330,6 +375,11 @@ export default function TeacherDashboard({ onAddCourse, user, refreshSignal, tok
         courseId={selectedCourse?._id}
         token={token}
         onCreated={() => { setShowAddAssignment(false); setActiveTab('assignments'); setAssignmentsRefresh(v=>v+1) }}
+      />
+      <AddModuleModal
+        open={showAddModule}
+        onClose={() => setShowAddModule(false)}
+        onCreated={(module) => { setShowAddModule(false); setModules((prev)=> [{ id: `${selectedCourse?._id}-${Date.now()}`, ...module }, ...prev]) }}
       />
     </section>
   )
