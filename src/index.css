@@ -77,11 +77,11 @@ body {
 
 /* Stats */
 .stats { margin-top: -48px; position: relative; z-index: 2; }
-.stats__grid { background: #fff; color: #111321; border-radius: 16px; box-shadow: 0 10px 50px rgba(0,0,0,.25); display: grid; grid-template-columns: repeat(4, 1fr); padding: 24px; gap: 16px; }
+.stats__grid { background: linear-gradient(180deg, rgba(255,194,72,0.95), rgba(255,123,57,0.92)); color: #1d1209; border-radius: 16px; box-shadow: 0 10px 50px rgba(255,123,57,.25); display: grid; grid-template-columns: repeat(4, 1fr); padding: 24px; gap: 16px; border: 1px solid rgba(0,0,0,.08); }
 .stat { display: grid; justify-items: center; text-align: center; padding: 12px; }
-.stat__icon { width: 56px; height: 56px; display: grid; place-items: center; background: linear-gradient(180deg, #f0f4ff, #e7ebff); border-radius: 14px; font-size: 24px; }
-.stat__value { font-size: 24px; margin-top: 12px; font-weight: 800; }
-.stat__label { color: #536180; font-size: 14px; }
+.stat__icon { width: 56px; height: 56px; display: grid; place-items: center; background: linear-gradient(180deg, #ffedd2, #ffd8a8); border-radius: 14px; font-size: 24px; color: #5a3a1e; border: 1px solid rgba(0,0,0,.08); }
+.stat__value { font-size: 24px; margin-top: 12px; font-weight: 900; color: #1d1209; }
+.stat__label { color: #3b2719; font-size: 14px; font-weight: 600; }
 
 /* Sections */
 .section__title { text-align: center; font-size: clamp(28px, 4.8vw, 46px); margin: 56px 0 6px; font-weight: 800; }
