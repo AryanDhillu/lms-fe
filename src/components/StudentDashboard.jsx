@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { getMyCourses, getCourseAssignments } from '../api'
 import TakeAssignmentModal from './TakeAssignmentModal'
+import CourseFeedbackModal from './CourseFeedbackModal'
 
 export default function StudentDashboard({ token }) {
   const [loading, setLoading] = useState(true)
@@ -12,6 +13,7 @@ export default function StudentDashboard({ token }) {
   const [assignError, setAssignError] = useState(null)
   const [activeModuleIndex, setActiveModuleIndex] = useState(0)
   const [activeAssignment, setActiveAssignment] = useState(null)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
 
   // Sum of grades for submitted assignments in the selected course
   const totalSubmittedScore = useMemo(() => {
@@ -141,7 +143,7 @@ export default function StudentDashboard({ token }) {
                   <div className="course__media" />
                   <div className="course__badges">
                     <span className="badge">Enrolled</span>
-                    {isSelected && <span className="badge" style={{ background: '#3b82f6' }}>Selected</span>}
+                    {isSelected && <span className="badge" style={{ background: 'var(--brand)' }}>Selected</span>}
                   </div>
                   <h3 className="course__title">{c.title}</h3>
                   <p className="course__desc">{c.description}</p>
@@ -161,29 +163,53 @@ export default function StudentDashboard({ token }) {
 
                   {isSelected && (
                     <div style={{ marginTop: 14 }}>
-                      {selectedCourse?.materialUrl && (
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
-                          <a
-                            className="btn btn--secondary"
-                            href={selectedCourse.materialUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e)=> e.stopPropagation()}
+                      {/* Selected course header with Back + highlighted Download */}
+                      <div className="sd__header" onClick={(e)=> e.stopPropagation()}>
+                        <div className="sd__title-wrap">
+                          <button
+                            className="btn btn--ghost sd__back"
+                            onClick={(e)=>{ e.stopPropagation(); setSelectedCourse(null) }}
+                            title="Back to courses"
                           >
-                            Download Material
-                          </a>
+                            ← Back
+                          </button>
+                          <div>
+                            <div className="sd__title">{c.title}</div>
+                            {c._enrolledAt && (
+                              <div className="sd__subtitle">Enrolled: {new Date(c._enrolledAt).toLocaleDateString()}</div>
+                            )}
+                          </div>
                         </div>
-                      )}
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                          {selectedCourse?.materialUrl && (
+                            <a
+                              className="btn btn--primary sd-download"
+                              href={selectedCourse.materialUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e)=> e.stopPropagation()}
+                            >
+                              ⬇ Download Material
+                            </a>
+                          )}
+                          <button
+                            className="btn btn--secondary"
+                            onClick={(e)=> { e.stopPropagation(); setFeedbackOpen(true) }}
+                          >
+                            ✍️ Submit Feedback
+                          </button>
+                        </div>
+                      </div>
+
                       <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 16 }}>
                         {/* Modules sidebar */}
                         <div style={{ border: '1px solid rgba(255,255,255,.12)', borderRadius: 12, padding: 12, background: '#0b1232' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                             <h4 style={{ margin: 0 }}>Modules</h4>
-                            <button className="btn btn--ghost" onClick={(e)=>{ e.stopPropagation(); setSelectedCourse(null) }}>Back</button>
                           </div>
                           <div style={{ display: 'grid', gap: 8 }}>
                             {modules.map((m, i) => (
-                              <button key={i} className="btn btn--primary-outline" style={{ justifyContent: 'space-between', padding: '10px 12px', borderColor: i === activeModuleIndex ? '#7b72ff' : undefined }} onClick={(e)=>{ e.stopPropagation(); setActiveModuleIndex(i) }}>
+                              <button key={i} className="btn btn--primary-outline" style={{ justifyContent: 'space-between', padding: '10px 12px', borderColor: i === activeModuleIndex ? 'var(--brand)' : undefined }} onClick={(e)=>{ e.stopPropagation(); setActiveModuleIndex(i) }}>
                                 <span>{m.title}</span>
                                 {i === activeModuleIndex && <span>▶</span>}
                               </button>
@@ -220,7 +246,7 @@ export default function StudentDashboard({ token }) {
                       <div style={{ marginTop: 16, border: '1px solid rgba(255,255,255,.12)', borderRadius: 12, padding: 12, background: '#0b1232' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
                           <h4 style={{ marginTop: 0, marginBottom: 0 }}>Assignments</h4>
-                          <div style={{ color: '#cfd7ff', fontWeight: 800 }}>Total Score: {totalSubmittedScore}</div>
+                          <div className="sd-total-pill">🏆 Total Grade: <span>{totalSubmittedScore}</span></div>
                         </div>
                         {assignLoading && <div style={{ color: '#9aa6d1' }}>Loading assignments…</div>}
                         {!assignLoading && assignError && <div className="alert alert--error">{assignError}</div>}
@@ -282,6 +308,16 @@ export default function StudentDashboard({ token }) {
               }
             })()
           }
+        }}
+      />
+
+      <CourseFeedbackModal
+        open={feedbackOpen}
+        onClose={() => setFeedbackOpen(false)}
+        course={selectedCourse}
+        token={token}
+        onSubmitted={() => {
+          setFeedbackOpen(false)
         }}
       />
     </section>

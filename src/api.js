@@ -136,3 +136,17 @@ export async function updateCourse(courseId, payload, token) {
   })
   return handleResponse(res)
 }
+
+// Course feedback from student
+export async function submitCourseFeedback(courseId, payload, token) {
+  // payload: { rating?: number(1-5), feedback: string }
+  const res = await fetch(`${API_BASE_URL}/api/courses/${courseId}/feedback`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  })
+  return handleResponse(res)
+}
