@@ -1,12 +1,12 @@
-const Category = ({ icon, title, count }) => (
-  <div className="category">
+const Category = ({ icon, title, count, active, onClick }) => (
+  <button className="category" onClick={onClick} aria-pressed={!!active} style={{ borderColor: active ? 'rgba(255,255,255,.22)' : undefined, cursor: 'pointer' }}>
     <div className="category__icon">{icon}</div>
     <div className="category__title">{title}</div>
     <div className="category__count">{count} courses</div>
-  </div>
+  </button>
 );
 
-export default function Categories() {
+export default function Categories({ selected, onSelect }) {
   const data = [
     { icon: "<>", title: "Technology", count: 156 },
     { icon: "📋", title: "Business", count: 89 },
@@ -22,7 +22,7 @@ export default function Categories() {
         <p className="section__subtitle">Discover courses across various disciplines and find your passion</p>
         <div className="categories__grid">
           {data.map((c) => (
-            <Category key={c.title} {...c} />
+            <Category key={c.title} {...c} active={selected === c.title} onClick={() => onSelect && onSelect(c.title)} />
           ))}
         </div>
       </div>

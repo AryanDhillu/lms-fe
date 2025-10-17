@@ -26,6 +26,7 @@ function App() {
   const [showAddCourse, setShowAddCourse] = useState(false)
   const [refreshSignal, setRefreshSignal] = useState(0)
   const [selectedCourse, setSelectedCourse] = useState(null)
+  const [selectedCategory, setSelectedCategory] = useState(null)
 
   useEffect(() => {
     const savedUser = localStorage.getItem('edupro:user')
@@ -78,8 +79,8 @@ function App() {
           <main>
             <Hero onSignUp={openSignup} />
             <Stats />
-            <Categories />
-            <PopularCourses user={user} onOpenCourse={setSelectedCourse} />
+            <Categories selected={selectedCategory} onSelect={setSelectedCategory} />
+            <PopularCourses user={user} onOpenCourse={setSelectedCourse} selectedCategory={selectedCategory} />
             <Features />
             <CTA onSignUp={openSignup} />
           </main>

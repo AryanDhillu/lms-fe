@@ -89,3 +89,38 @@ export async function createAssignment(payload, token) {
   })
   return handleResponse(res)
 }
+
+export async function getCourseAssignments(courseId, token) {
+  const res = await fetch(`${API_BASE_URL}/api/courses/${courseId}/assignments`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  return handleResponse(res)
+}
+
+export async function submitAssignment(assignmentId, payload, token) {
+  // payload: { answers: [{ questionText, selectedAnswer }] }
+  const res = await fetch(`${API_BASE_URL}/api/assignments/${assignmentId}/submit`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  })
+  return handleResponse(res)
+}
+
+// Teacher view: list assignments for a course including submission counts
+export async function getAssignmentsTeacherView(courseId, token) {
+  const res = await fetch(`${API_BASE_URL}/api/assignments/course/${courseId}/teacher-view`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  return handleResponse(res)
+}
+
+export async function getAssignmentSubmissions(assignmentId, token) {
+  const res = await fetch(`${API_BASE_URL}/api/assignments/${assignmentId}/submissions`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  return handleResponse(res)
+}
